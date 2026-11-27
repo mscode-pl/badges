@@ -78,7 +78,7 @@ export function renderBadge(spec: BadgeSpec): string {
         let cx = x + size.pad;
         if (s.icon) {
             // On a coloured segment the mark takes the text colour, like a logo on a brand button.
-            body += drawIcon(s.icon, cx, (size.height - size.icon) / 2, size.icon, s.bg, s.neutral ? undefined : s.ink);
+            body += drawIcon(s.icon, cx, (size.height - size.icon) / 2, size.icon, { ground: s.bg, fill: s.neutral ? undefined : s.ink });
             cx += size.icon + size.gap;
         }
         if (s.text) body += `<path fill="${s.ink}" d="${textPath(s.family, s.text, size.font, cx, baseline)}"/>`;

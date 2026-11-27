@@ -29,7 +29,7 @@
 
 ## Why
 
-shields.io and skillicons.dev are great, but they come in two different looks, and skillicons has no Hono, Caddy, Traefik, GoLand, Stripe, Strapi, Przelewy24 or InPost. Here badges, buttons and icons share one style, every badge has a light and a dark variant for `<picture>`, and the text is drawn as paths, so widths are exact and nothing gets clipped on machines without the fonts.
+shields.io, skillicons.dev and the profile view counters are great, but they come in different looks, and skillicons has no Hono, Caddy, Traefik, GoLand, Stripe, Strapi, Przelewy24 or InPost. Here badges, buttons and icons share one style, every badge has a light and a dark variant for `<picture>`, and the text is drawn as paths, so widths are exact and nothing gets clipped on machines without the fonts.
 
 ## Badges
 
@@ -42,8 +42,11 @@ The page at [badges.mscode.pl](https://badges.mscode.pl) has a badge maker and e
 | Packagist version, downloads, license | `/packagist/v/<vendor>/<package>`, `/packagist/dt/...` (also `dm`, `dd`), `/packagist/l/...` |
 | GitHub Actions | `/github/actions/<owner>/<repo>/<workflow file>?branch=master` |
 | GitHub stars, license | `/github/stars/<owner>/<repo>`, `/github/license/<owner>/<repo>` |
+| Profile views | `/views/<name>`, `?base=1000` to start from a number. Never cached, so every view counts |
+| WakaTime coding time | `/wakatime/<user>`, or with a range: `/wakatime/<user>/7d` (also `30d`, `6m`, `1y`, `all`), `?lang=TypeScript` for one language |
+| Wakapi coding time | `/wakapi/<user>` on wakapi.dev, `?instance=wakapi.example.com` for your own instance. Same ranges and `lang` |
 
-In static badges `_` is a space and `__` an underscore. When an upstream API fails, the badge says `unknown` instead of breaking the image.
+In static badges `_` is a space and `__` an underscore. WakaTime and Wakapi only answer for users whose stats are public. When an upstream API fails, the badge says `unknown` instead of breaking the image.
 
 ## Icons
 
@@ -54,7 +57,11 @@ In static badges `_` is a space and `__` an underscore. When an upstream API fai
 </picture>
 ```
 
-Ids follow skillicons (`ts`, `py`, `postgres`, `idea`) and accept Simple Icons slugs as aliases. `perline=` wraps the row, 15 by default.
+Three themes: `dark` (default), `light` and `color`, where every tile takes its brand colour:
+
+![React, TypeScript, Hono, Docker, Discord](https://badges.mscode.pl/icons?i=react,ts,hono,docker,discord&theme=color)
+
+Ids follow skillicons (`ts`, `py`, `postgres`, `idea`) and accept Simple Icons slugs as aliases. `perline=` wraps the row, 15 by default. The [icon builder](https://badges.mscode.pl/#icons) lets you pick, reorder and copy a row.
 
 ## Options
 
@@ -85,7 +92,7 @@ MIT. Badges are free to use anywhere, no attribution needed.
 
 ## Credits
 
-Badge fonts: [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), copies in `fonts/`. Page fonts: [Geist](https://github.com/vercel/geist-font) and [Outfit](https://github.com/Outfitio/Outfit-Fonts), copies in `public/fonts/`. All under the SIL Open Font License. Brand icons: [Simple Icons](https://simpleicons.org), CC0. PHP, Visual Studio Code, LinkedIn and InPost logos from Wikimedia Commons (public domain), Przelewy24 from przelewy24.pl, sources in `icons/brand/`. Logos remain trademarks of their owners.
+Badge fonts: [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), copies in `fonts/`. Page fonts: [Geist](https://github.com/vercel/geist-font) and [Outfit](https://github.com/Outfitio/Outfit-Fonts), copies in `public/fonts/`. All under the SIL Open Font License. Brand icons: full-colour logos from [devicon](https://github.com/devicons/devicon) (MIT, copies in `icons/devicon/`) and one-colour marks from [Simple Icons](https://simpleicons.org) (CC0). PHP, VS Code and LinkedIn logos from Wikimedia Commons. Logos are trademarks of their owners. PHP, Visual Studio Code, LinkedIn and InPost logos from Wikimedia Commons (public domain), Przelewy24 from przelewy24.pl, sources in `icons/brand/`. Logos remain trademarks of their owners.
 
 ---
 

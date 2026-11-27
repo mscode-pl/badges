@@ -39,12 +39,19 @@ const aliases: Record<string, string> = {
     website: 'web',
     mail: 'email',
     twitter: 'x',
+    woo: 'woocommerce',
+    csharp: 'cs',
+    dotnetcore: 'dotnet',
 };
 
 export function findIcon(id: string | null | undefined): Icon | undefined {
     if (!id) return undefined;
     const key = id.trim().toLowerCase();
     return icons[key] ?? icons[aliases[key] ?? ''];
+}
+
+export function aliasesOf(id: string): string[] {
+    return Object.keys(aliases).filter((alias) => aliases[alias] === id);
 }
 
 export function iconIds(): string[] {
