@@ -6,9 +6,9 @@ const tile = 256;
 const gap = 44;
 const mark = 150;
 
-const grounds: Record<Theme, { bg: string; stroke: string; opacity: number }> = {
-    dark: { bg: '#0b1728', stroke: '#ffffff', opacity: 0.1 },
-    light: { bg: '#ffffff', stroke: '#0a0a0a', opacity: 0.1 },
+const grounds: Record<Theme, { bg: string; stroke: string; opacity: number; minimum: number }> = {
+    dark: { bg: '#0b1728', stroke: '#ffffff', opacity: 0.1, minimum: 3 },
+    light: { bg: '#ffffff', stroke: '#0a0a0a', opacity: 0.1, minimum: 2.2 },
 };
 
 export function renderIconRow(list: Icon[], theme: Theme, perLine: number): string {
@@ -24,7 +24,7 @@ export function renderIconRow(list: Icon[], theme: Theme, perLine: number): stri
         const y = Math.floor(i / columns) * (tile + gap);
         return `<g><title>${escapeXml(icon.title)}</title>`
             + `<rect x="${x + 2}" y="${y + 2}" width="${tile - 4}" height="${tile - 4}" rx="58" fill="${ground.bg}" stroke="${ground.stroke}" stroke-opacity="${ground.opacity}" stroke-width="4"/>`
-            + drawIcon(icon, x + offset, y + offset, mark, ground.bg, undefined, 1.55)
+            + drawIcon(icon, x + offset, y + offset, mark, { ground: ground.bg, spread: 1.45, minimum: ground.minimum })
             + '</g>';
     }).join('');
 

@@ -110,7 +110,7 @@ describe('handle', () => {
         const res = await get('/badge/node/22+?color=339933');
         expect(res.status).toBe(200);
         expect(res.headers.get('content-type')).toContain('image/svg+xml');
-        expect(res.headers.get('cache-control')).toContain('max-age=86400');
+        expect(res.headers.get('cache-control')).toContain('max-age=3600');
         expect(await res.text()).toContain('aria-label="node: 22+"');
     });
 

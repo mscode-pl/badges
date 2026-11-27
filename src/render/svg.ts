@@ -32,15 +32,33 @@ export function markColor(mark: string, ground: string, minimum = 2): string {
     return target;
 }
 
-// Wide logos such as Przelewy24 may spread past the square box by `spread`, so they stay legible in a tile.
-export function drawIcon(icon: Icon, x: number, y: number, size: number, ground: string, fill?: string, spread = 1): string {
+export interface IconOptions {
+    ground: string;
+    fill?: string;
+    spread?: number;
+    minimum?: number;
+}
+
+// Fits a viewBox into the square box; wide marks may spread past it by `spread` so they stay legible in a tile.
+function nest(viewBox: string, content: string, x: number, y: number, size: number, spread: number): string {
+    const [, , vw = 1, vh = 1] = viewBox.split(' ').map(Number);
+    const aspect = vw / vh;
+    const w = Math.min(size * spread, size * Math.max(1, aspect));
+    const h = Math.min(size, w / aspect);
+    return `<svg x="${n(x + (size - w) / 2)}" y="${n(y + (size - h) / 2)}" width="${n(w)}" height="${n(h)}" viewBox="${viewBox}" overflow="visible">${content}</svg>`;
+}
+
+export function drawIcon(icon: Icon, x: number, y: number, size: number, options: IconOptions): string {
+    const { ground, fill, spread = 1, minimum = 2 } = options;
     if ('body' in icon) {
-        const [, , vw = 1, vh = 1] = icon.viewBox.split(' ').map(Number);
-        const aspect = vw / vh;
-        const w = Math.min(size * spread, size * Math.max(1, aspect));
-        const h = Math.min(size, w / aspect);
-        return `<svg x="${n(x + (size - w) / 2)}" y="${n(y + (size - h) / 2)}" width="${n(w)}" height="${n(h)}" viewBox="${icon.viewBox}" overflow="visible">${icon.body}</svg>`;
+        const content = fill && icon.mono ? `<path fill="${fill}" fill-rule="evenodd" d="${icon.mono}"/>` : icon.body;
+        return nest(icon.viewBox, content, x, y, size, spread);
     }
-    const scale = size / 24;
-    return `<path fill="${fill ?? markColor(icon.hex, ground)}" transform="translate(${n(x)} ${n(y)}) scale(${n(scale)})" d="${icon.path}"/>`;
+    const backing = !fill && icon.backing ? `<rect x="2" y="2" width="20" height="20" fill="${icon.backing}"/>` : '';
+    const color = fill ?? (backing ? icon.hex : markColor(icon.hex, ground, minimum));
+    const content = `${backing}<path fill="${color}" d="${icon.path}"/>`;
+    const [, , bw = 1, bh = 1] = (icon.box ?? '0 0 24 24').split(' ').map(Number);
+    // In a tile, wide marks such as MySQL use their tight box instead of a thin band of the 24 square.
+    const viewBox = spread > 1 && icon.box && bw / bh > 1.2 ? icon.box : '0 0 24 24';
+    return nest(viewBox, content, x, y, size, spread);
 }

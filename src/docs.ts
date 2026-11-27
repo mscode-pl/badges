@@ -1,4 +1,5 @@
-import { iconIds, icons } from './icons/registry';
+import { categories, keywords } from './icons/categories';
+import { aliasesOf, iconIds, icons } from './icons/registry';
 import { named } from './render/colors';
 
 interface Example {
@@ -115,7 +116,13 @@ export function docsPage(origin: string): string {
 <div class="examples">${g.examples.map((ex) => example(origin, ex)).join('')}</div>
 </section>`).join('\n');
 
-    const iconCells = ids.map((id) => `<li><button type="button" class="icon" data-copy="${id}" title="Copy ${esc(icons[id]!.title)}"><img src="/icons?i=${id}" alt="" width="36" height="36" loading="lazy"><span>${id}</span></button></li>`).join('');
+    const iconCell = (id: string) => {
+        const icon = icons[id]!;
+        const search = [id, icon.title, ...aliasesOf(id), keywords[id] ?? ''].join(' ').toLowerCase();
+        return `<li data-search="${esc(search)}"><button type="button" class="icon" data-id="${id}" aria-pressed="false" title="${esc(icon.title)}"><img src="/icons?i=${id}" alt="" width="40" height="40" loading="lazy"><span>${id}</span></button></li>`;
+    };
+    const iconGroups = categories.map((c) => `<section class="icon-group"><h3>${esc(c.name)} <span>${c.ids.length}</span></h3><ul class="icons">${c.ids.map(iconCell).join('')}</ul></section>`).join('');
+    const searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
 
     return `<!doctype html>
 <html lang="en">
@@ -252,11 +259,37 @@ dt { font-family: var(--mono); font-size: 0.875rem; }
 dd { margin: 0; color: var(--muted-fg); text-align: right; }
 
 pre { margin: 1.25rem 0 0; padding: 0.875rem 1rem; border: 1px solid var(--input); background: var(--muted); border-radius: 0.75rem; overflow-x: auto; font-size: 0.8125rem; line-height: 1.6; }
-.icons { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr)); gap: 0.25rem; }
-.icon { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 0.75rem 0.25rem 0.5rem; border: 1px solid transparent; border-radius: 0.75rem; background: transparent; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; }
+.search { position: relative; margin-top: 1.25rem; }
+.search svg { position: absolute; left: 0.85rem; top: 50%; width: 1rem; height: 1rem; translate: 0 -50%; color: var(--subtle); pointer-events: none; }
+.search input { width: 100%; height: 2.75rem; padding: 0 3rem 0 2.5rem; border: 1px solid var(--input); border-radius: 0.75rem; background: var(--muted); color: var(--fg); font: 400 0.9375rem var(--sans); transition: border-color 150ms ease, box-shadow 150ms ease; }
+.search input::placeholder { color: var(--subtle); }
+.search input:hover { border-color: rgb(255 255 255 / 0.16); }
+.search input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgb(76 141 255 / 0.2); }
+.search kbd { position: absolute; right: 0.75rem; top: 50%; translate: 0 -50%; font: 500 0.75rem var(--mono); color: var(--muted-fg); border: 1px solid var(--input); border-radius: 0.3rem; padding: 0 0.35rem; }
+.search input:focus ~ kbd, .search input:not(:placeholder-shown) ~ kbd { display: none; }
+.picker { position: sticky; bottom: 1rem; z-index: 5; margin-top: 1.5rem; padding: 0.625rem 0.625rem 0.625rem 1rem; border: 1px solid var(--input); border-radius: 0.875rem; background: color-mix(in srgb, var(--ink-2), black 12%); box-shadow: var(--highlight), 0 12px 32px rgb(0 0 0 / 0.5); display: flex; align-items: center; gap: 1rem; }
+.picker-count { flex: none; font-size: 0.875rem; color: var(--muted-fg); }
+.picker-count strong { color: var(--fg); font-weight: 600; }
+.picker-preview { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.picker-preview img { height: 2rem; width: auto; max-width: none; }
+.picker-actions { flex: none; display: flex; gap: 0.375rem; }
+@media (max-width: 640px) { .picker { flex-wrap: wrap; } .picker-actions { width: 100%; } .picker-actions .btn { flex: 1; } }
+.btn[data-done] { border-color: rgb(74 222 128 / 0.6); }
+.picker[data-empty] { display: none; }
+.btn-small { height: 1.875rem; padding-inline: 0.65rem; font-size: 0.8125rem; border-radius: 0.6rem; }
+.icon-group { margin-top: 1.75rem; }
+.icon-group h3 { margin: 0 0 0.5rem; font: 600 0.75rem var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--subtle); }
+.icon-group h3 span { margin-left: 0.25rem; color: var(--muted-fg); font-family: var(--mono); letter-spacing: 0; }
+.icons { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr)); gap: 0.25rem; }
+.icon { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 0.75rem 0.25rem 0.5rem; border: 1px solid transparent; border-radius: 0.75rem; background: transparent; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; }
 .icon:hover { background: var(--accent); border-color: var(--border); }
+.icon:active img { transform: scale(0.94); }
+.icon img { transition: transform 150ms ease; }
 .icon span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-family: var(--mono); font-size: 0.75rem; color: var(--muted-fg); }
-.icon[data-done] span { color: var(--ok); }
+.icon[aria-pressed="true"] { background: rgb(76 141 255 / 0.1); border-color: rgb(76 141 255 / 0.55); }
+.icon[aria-pressed="true"] span { color: var(--fg); }
+.icon[aria-pressed="true"]::after { content: attr(data-order); position: absolute; top: 0.35rem; right: 0.35rem; min-width: 1.125rem; height: 1.125rem; padding-inline: 0.25rem; border-radius: 999px; background: var(--primary); color: #fff; font: 600 0.6875rem/1.125rem var(--sans); text-align: center; }
+.empty { margin: 1.75rem 0 0; color: var(--muted-fg); font-size: 0.9375rem; }
 
 footer { position: relative; }
 footer::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.12), transparent); }
@@ -333,9 +366,16 @@ ${cards}
 
 <section class="card wide rise" style="--d: 520ms" id="icons" aria-labelledby="icons-title">
 <h2 id="icons-title">Icons</h2>
-<p class="intro">Rows of icons in one image, <code>/icons?i=react,ts,hono</code>. Dark by default, <code>theme=light</code> for light, <code>perline=</code> to wrap (15 by default). Sized like skillicons, so <code>height="40"</code> keeps working. Click an icon to copy its id.</p>
+<p class="intro">Rows of icons in one image, <code>/icons?i=react,ts,hono</code>. Dark by default, <code>theme=light</code> for light, <code>perline=</code> to wrap (15 by default). Sized like skillicons, so <code>height="40"</code> keeps working. Click icons to build your own row; the order you click is the order in the image.</p>
 <pre><code>${esc(picture)}</code></pre>
-<ul class="icons">${iconCells}</ul>
+<div class="search">${searchIcon}<input id="icon-search" type="search" placeholder="Search ${ids.length} icons, e.g. laravel, database, jetbrains" aria-label="Search icons" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>
+<div id="icon-groups">${iconGroups}</div>
+<div class="picker" id="picker" data-empty aria-live="polite">
+<span class="picker-count"><strong id="pick-count">0</strong> picked</span>
+<span class="picker-preview"><img id="pick-dark" alt="Your row"></span>
+<span class="picker-actions"><button type="button" class="btn btn-small btn-primary" id="pick-copy-html" title="Picture tag with light and dark variants">Copy HTML</button><button type="button" class="btn btn-small" id="pick-copy-md">Copy Markdown</button><button type="button" class="btn btn-small" id="pick-clear">Clear</button></span>
+</div>
+<p class="empty" id="icon-empty" hidden>No icons match. Missing one? <a href="https://github.com/mscode-pl/badges/issues">Ask for it on GitHub</a>.</p>
 </section>
 </div>
 </main>
@@ -381,6 +421,60 @@ form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(b
 form.addEventListener('submit', (e) => e.preventDefault());
 document.querySelectorAll('.swatch').forEach((b) => b.addEventListener('click', () => { form.color.value = b.dataset.color; build(); }));
 build();
+const picked = [];
+const picker = document.getElementById('picker');
+function renderPick() {
+  document.querySelectorAll('.icon[data-id]').forEach((b) => {
+    const at = picked.indexOf(b.dataset.id);
+    b.setAttribute('aria-pressed', at >= 0 ? 'true' : 'false');
+    if (at >= 0) b.dataset.order = String(at + 1); else delete b.dataset.order;
+  });
+  document.getElementById('pick-count').textContent = String(picked.length);
+  if (!picked.length) { picker.setAttribute('data-empty', ''); return; }
+  picker.removeAttribute('data-empty');
+  const path = '/icons?i=' + picked.join(',');
+  document.getElementById('pick-dark').src = path + '&theme=dark';
+  const alt = picked.join(', ');
+  const html = '<picture><source media="(prefers-color-scheme: dark)" srcset="' + origin + path + '&theme=dark"><img src="' + origin + path + '&theme=light" alt="' + alt + '" height="40"></picture>';
+  const md = '![' + alt + '](' + origin + path + ')';
+  document.getElementById('pick-copy-html').dataset.copy = html;
+  document.getElementById('pick-copy-md').dataset.copy = md;
+}
+document.getElementById('icon-groups').addEventListener('click', (event) => {
+  const button = event.target.closest('.icon[data-id]');
+  if (!button) return;
+  const at = picked.indexOf(button.dataset.id);
+  if (at >= 0) picked.splice(at, 1); else picked.push(button.dataset.id);
+  renderPick();
+});
+document.getElementById('pick-clear').addEventListener('click', () => { picked.length = 0; renderPick(); });
+
+const search = document.getElementById('icon-search');
+search.addEventListener('input', () => {
+  const terms = search.value.toLowerCase().split(/\\s+/).filter(Boolean);
+  let shown = 0;
+  document.querySelectorAll('.icon-group').forEach((group) => {
+    let visible = 0;
+    group.querySelectorAll('li[data-search]').forEach((li) => {
+      const groupName = group.querySelector('h3').textContent.toLowerCase();
+      const hay = li.dataset.search + ' ' + groupName;
+      const match = terms.every((t) => hay.includes(t));
+      li.hidden = !match;
+      if (match) visible++;
+    });
+    group.hidden = visible === 0;
+    group.querySelector('h3 span').textContent = String(visible);
+    shown += visible;
+  });
+  document.getElementById('icon-empty').hidden = shown > 0;
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key !== '/' || event.target.closest('input, textarea')) return;
+  event.preventDefault();
+  search.focus();
+  search.scrollIntoView({ block: 'center', behavior: 'smooth' });
+});
+
 document.addEventListener('click', async (event) => {
   const button = event.target.closest('[data-copy]');
   if (!button) return;

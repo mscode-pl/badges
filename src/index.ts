@@ -12,7 +12,7 @@ export interface Env {
     CF_VERSION_METADATA?: { id: string };
 }
 
-const seconds = { static: 86400, live: 900, error: 120 };
+const seconds = { static: 3600, live: 900, error: 120 };
 
 function svg(body: string, maxAge: number): Response {
     return new Response(body, {

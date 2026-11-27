@@ -47,6 +47,10 @@ export function findIcon(id: string | null | undefined): Icon | undefined {
     return icons[key] ?? icons[aliases[key] ?? ''];
 }
 
+export function aliasesOf(id: string): string[] {
+    return Object.keys(aliases).filter((alias) => aliases[alias] === id);
+}
+
 export function iconIds(): string[] {
     return Object.keys(icons).sort();
 }

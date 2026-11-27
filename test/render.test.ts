@@ -1,3 +1,4 @@
+import { categories } from '../src/icons/categories';
 import { describe, expect, it } from 'vitest';
 import { findIcon, iconIds } from '../src/icons/registry';
 import { renderBadge } from '../src/render/badge';
@@ -78,7 +79,7 @@ describe('icons', () => {
         const list = ['react', 'ts', 'js', 'go', 'php'].map((id) => findIcon(id)!);
         const svg = renderIconRow(list, 'dark', 3);
         expect(svg).toContain('viewBox="0 0 856 556"');
-        expect(svg.match(/<rect/g)?.length).toBe(5);
+        expect(svg.match(/rx="58"/g)?.length).toBe(5);
     });
 
     it('nests multi-colour logos with ids prefixed per icon', () => {
@@ -89,7 +90,28 @@ describe('icons', () => {
         expect(svg).not.toMatch(/xlink:|<script|<metadata/);
     });
 
+    it('gives LinkedIn a one-colour mark on coloured buttons', () => {
+        const svg = renderBadge({ message: 'LinkedIn', color: '#0a66c2', theme: 'light', style: 'button', icon: findIcon('linkedin') });
+        expect(svg).toContain('fill="#ffffff" fill-rule="evenodd"');
+        expect(svg).not.toContain('#007EBB');
+    });
+
+    it('keeps the JavaScript yellow with black letters on a light tile', () => {
+        const svg = renderIconRow([findIcon('js')!], 'light', 15);
+        expect(svg).toContain('fill="#000000"');
+        expect(svg).toContain('fill="#f7df1e"');
+    });
+
     it('has no duplicate ids', () => {
         expect(new Set(iconIds()).size).toBe(iconIds().length);
+    });
+});
+
+describe('categories', () => {
+    it('puts every icon in exactly one category', () => {
+        const listed = categories.flatMap((c) => c.ids);
+        expect(listed.filter((id) => !findIcon(id))).toEqual([]);
+        expect(new Set(listed).size).toBe(listed.length);
+        expect([...iconIds()].filter((id) => !listed.includes(id))).toEqual([]);
     });
 });
