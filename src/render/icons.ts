@@ -8,8 +8,6 @@ const tile = 256;
 const gap = 44;
 const mark = 172;
 const radius = 58;
-// Wide logos such as PHP may grow past the mark box, but keep this much clear space from the tile edge.
-const spread = (tile - 2 * 30) / mark;
 
 const grounds: Record<'dark' | 'light', { bg: string; stroke: string; minimum: number }> = {
     dark: { bg: '#0b1728', stroke: '#ffffff', minimum: 3 },
@@ -20,7 +18,7 @@ function isFull(icon: Icon): boolean {
     return 'path' in icon ? Boolean(icon.backing) : Boolean(icon.full);
 }
 
-// Square logos (TS, JS, CSS, LinkedIn) are scaled to the tile and clipped to its corners, like skillicons.
+// In the colour theme square logos (TS, JS, CSS, LinkedIn) become the tile itself, clipped to its corners.
 function fullLogo(icon: Icon, i: number, x: number, y: number): string {
     const content = 'path' in icon
         ? `<rect x="2" y="2" width="20" height="20" fill="${icon.backing}"/><path fill="${icon.hex}" d="${icon.path}"/>`
@@ -46,7 +44,7 @@ function colorTile(icon: Icon, i: number, x: number, y: number): string {
         const at = (tile - size) / 2;
         return back + `<svg x="${n(x + at)}" y="${n(y + at)}" width="${n(size)}" height="${n(size)}" viewBox="0 0 24 24">${icon.tileBody}</svg>`;
     }
-    return back + drawIcon(icon, x + offset, y + offset, mark, { ground: stops[0]!, fill: markInk, spread });
+    return back + drawIcon(icon, x + offset, y + offset, mark, { ground: stops[0]!, fill: markInk, wide: 0.88 });
 }
 
 export function renderIconRow(list: Icon[], theme: IconTheme, perLine: number): string {
@@ -60,12 +58,11 @@ export function renderIconRow(list: Icon[], theme: IconTheme, perLine: number): 
         const x = (i % columns) * (tile + gap);
         const y = Math.floor(i / columns) * (tile + gap);
         let content: string;
-        if (isFull(icon)) content = fullLogo(icon, i, x, y);
-        else if (theme === 'color') content = colorTile(icon, i, x, y);
+        if (theme === 'color') content = isFull(icon) ? fullLogo(icon, i, x, y) : colorTile(icon, i, x, y);
         else {
             const ground = grounds[theme];
             content = `<rect x="${x + 2}" y="${y + 2}" width="${tile - 4}" height="${tile - 4}" rx="${radius}" fill="${ground.bg}" stroke="${ground.stroke}" stroke-opacity="0.1" stroke-width="4"/>`
-                + drawIcon(icon, x + offset, y + offset, mark, { ground: ground.bg, spread, minimum: ground.minimum });
+                + drawIcon(icon, x + offset, y + offset, mark, { ground: ground.bg, minimum: ground.minimum, wide: 0.88 });
         }
         return `<g><title>${escapeXml(icon.title)}</title>${content}</g>`;
     }).join('');

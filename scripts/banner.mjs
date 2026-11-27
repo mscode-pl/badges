@@ -84,9 +84,10 @@ function chip(t, x, w, label) {
 
 async function banner(t) {
     const q = `theme=${t.name}`;
-    const badges1 = await row([`/npm/v/@mscode-pl/email-lint?${q}`, `/badge/downloads/12k%2Fmonth?${q}`, `/badge/tests/passing/green?${q}`], 726, 58 + 46, 26, 10);
-    const badges2 = await row([`/badge/node/22+/339933?${q}`, `/badge/license/MIT?${q}`, `/badge/built_with/Hono/E36002?icon=hono&${q}`], 726, 58 + 82, 26, 10);
-    const icons = await embed(`/icons?i=react,ts,laravel,hono,docker,cloudflare,stripe&theme=${t.name}`, 726, 240 + 50, 46);
+    const badges1 = await row([`/npm/v/@mscode-pl/email-lint?${q}`, `/badge/downloads/12k%2Fmonth?${q}`, `/badge/tests/passing/green?${q}`], 726, 112, 26, 10);
+    const badges2 = await row([`/badge/node/22+/339933?${q}`, `/badge/license/MIT?${q}`, `/badge/built_with/Hono/E36002?icon=hono&${q}`], 726, 148, 26, 10);
+    const icons = await embed(`/icons?i=react,ts,laravel,hono,docker,cloudflare,stripe&theme=${t.name}`, 726, 208, 46);
+    const colorIcons = await embed('/icons?i=react,ts,laravel,hono,docker,cloudflare,stripe&theme=color', 726, 270, 46);
     const s = 750 / 868 / 5;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-label="MSCode Badges: badges and tech icons for your README">
 <defs>
@@ -102,12 +103,9 @@ ${text('body', 22, 72, 262, [['Badges and tech icons that match, in light and da
 ${chip(t, 72, 132, 'npm + GitHub')}
 ${chip(t, 214, 120, '109 icons')}
 ${chip(t, 344, 112, 'No sign-up')}
-${card(t, 58, 120, 'README', false)}${badges1}${badges2}
-<path d="M954 190V226" stroke="${t.accent}" stroke-width="2" stroke-dasharray="4 5"/>
-<path d="M946 222L954 232L962 222" fill="none" stroke="${t.accent}" stroke-width="2"/>
-<rect x="976" y="194" width="168" height="30" rx="15" fill="#1a5bb5"/>
-${text('mono', 13, 1060, 214, [['badges.mscode.pl', '#ffffff']], { anchor: 'middle' })}
-${card(t, 240, 118, '/icons', true)}${icons.svg}
+${card(t, 58, 280, 'README', true)}${badges1}${badges2}
+<path d="M726 192H1182" stroke="${t.cardStroke}" stroke-opacity="${t.cardStrokeOpacity}"/>
+${icons.svg}${colorIcons.svg}
 </svg>
 `;
 }

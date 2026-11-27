@@ -110,10 +110,14 @@ describe('icons', () => {
         expect(svg).not.toContain('stroke-opacity');
     });
 
-    it('lets square logos fill the whole tile in every theme', () => {
-        for (const theme of ['dark', 'light', 'color'] as const) {
-            expect(renderIconRow([findIcon('ts')!], theme, 15)).toContain('clip-path="url(#c0)"');
-        }
+    it('lets square logos fill the whole tile only in the colour theme', () => {
+        expect(renderIconRow([findIcon('ts')!], 'color', 15)).toContain('clip-path="url(#c0)"');
+        expect(renderIconRow([findIcon('ts')!], 'dark', 15)).not.toContain('clip-path');
+    });
+
+    it('keeps every mark inside its box on a tile', () => {
+        const svg = renderIconRow(['nuxt', 'mysql', 'tailwind', 'drizzle', 'php'].map((id) => findIcon(id)!), 'dark', 15);
+        for (const [, w] of svg.matchAll(/<svg x="[d.]+" y="[d.]+" width="([d.]+)"/g)) expect(Number(w)).toBeLessThanOrEqual(172);
     });
 
     it('has no duplicate ids', () => {

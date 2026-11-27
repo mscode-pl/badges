@@ -4,6 +4,7 @@ export interface PathIcon {
     path: string;
     box?: string;
     backing?: string;
+    bold?: number;
 }
 
 export interface SvgIcon {
@@ -12,6 +13,8 @@ export interface SvgIcon {
     viewBox: string;
     body: string;
     mono?: string;
+    // viewBox of `mono` when it comes from another source than `body`.
+    monoBox?: string;
     // One-colour body whose fills are currentColor, for logos whose paths carry transforms.
     monoBody?: string;
     // The logo is itself a rounded square, so it fills the whole tile.

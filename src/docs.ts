@@ -430,7 +430,7 @@ ${cards}
 
 <footer>
 <div class="page">
-<p>&copy; ${year} MSCode Mateusz Sikorski. Brand icons from <a href="https://simpleicons.org">Simple Icons</a> (CC0), trademarks of their owners.</p>
+<p>&copy; ${year} MSCode Mateusz Sikorski. Brand icons from <a href="https://github.com/devicons/devicon">devicon</a> (MIT) and <a href="https://simpleicons.org">Simple Icons</a> (CC0), trademarks of their owners.</p>
 <nav><a href="https://github.com/mscode-pl/badges">GitHub</a><a href="https://mscode.pl">mscode.pl</a></nav>
 </div>
 </footer>

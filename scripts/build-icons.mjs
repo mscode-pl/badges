@@ -1,4 +1,4 @@
-// Builds src/icons/generated.ts from Simple Icons and the logos in icons/brand. Run: pnpm icons
+// Builds src/icons/generated.ts from Simple Icons, devicon originals in icons/devicon and the logos in icons/brand. Run: pnpm icons
 import fs from 'node:fs';
 import * as simpleIcons from 'simple-icons';
 import { svgPathBbox } from 'svg-path-bbox';
@@ -93,7 +93,7 @@ const selection = {
     stripe: 'stripe',
     strapi: 'strapi',
     shopify: 'shopify',
-    woocommerce: 'woocommerce',
+    woocommerce: 'woo',
     wordpress: 'wordpress',
     medusa: 'medusa',
     discord: 'discord',
@@ -128,6 +128,25 @@ const jetbrainsIdes = {
 };
 const jetbrainsShapes = ['4,12 46,2 56,30 12,46', '28,20 68,28 62,66 22,60', '2,38 32,28 42,68 6,64'];
 const gradients = { jetbrains: ['#ff318c', '#7256ff'] };
+
+// Logos Simple Icons only has in one colour, rebuilt from its path: extra shapes on top, or the path split into colour regions.
+const layered = {
+    youtube: (path) => `<path fill="#ff0000" d="${path}"/><path fill="#ffffff" d="M9.545 15.568V8.432L15.818 12z"/>`,
+    gmail: (path) => {
+        const regions = [
+            ['#4285f4', 0, 5.2, 5.455, 18.8],
+            ['#c5221f', 0, 0, 5.455, 5.2],
+            ['#ea4335', 5.455, 0, 13.09, 24],
+            ['#34a853', 18.545, 5.2, 5.455, 18.8],
+            ['#fbbc04', 18.545, 0, 5.455, 5.2],
+        ];
+        const defs = regions.map(([, x, y, w, h], i) => `<clipPath id="gmail-r${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`).join('');
+        return `<defs>${defs}</defs>${regions.map(([fill], i) => `<path clip-path="url(#gmail-r${i})" fill="${fill}" d="${path}"/>`).join('')}`;
+    },
+};
+
+// Detailed marks with thin lines get a stroke in their own colour so they survive at 40px.
+const bold = { packagist: 0.2 };
 
 // Square logos with lettering cut out; the letters get their own colour so they do not take the tile's.
 const backing = {
@@ -172,12 +191,20 @@ function sanitize(id, source) {
     return { viewBox, body, mono, recolored };
 }
 
+// Full-colour originals from devicon (MIT) for logos Simple Icons reduces to one colour; Simple Icons still gives the one-colour mark.
+const devicon = new Set(fs.readdirSync(new URL('../icons/devicon/', import.meta.url)).filter((f) => f.endsWith('.svg')).map((f) => f.slice(0, -4)));
+
 const round = (v) => Math.round(v * 100) / 100;
 const lines = [];
 for (const [id, slug] of Object.entries(selection)) {
     if (brand[id]) continue;
     const icon = bySlug.get(slug);
     const hex = `#${icon.hex.toLowerCase()}`;
+    if (devicon.has(id)) {
+        const { viewBox, body } = sanitize(id, fs.readFileSync(new URL(`../icons/devicon/${id}.svg`, import.meta.url), 'utf8'));
+        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${hex}', viewBox: '${viewBox}', body: ${JSON.stringify(body)}, mono: ${JSON.stringify(icon.path)}, monoBox: '0 0 24 24' }`]);
+        continue;
+    }
     const ide = jetbrainsIdes[id];
     if (ide) {
         const [a, b, c] = ide.colors;
@@ -189,6 +216,11 @@ for (const [id, slug] of Object.entries(selection)) {
         lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${a}', viewBox: '0 0 70 70', body: ${JSON.stringify(body)}, tile: '${a},${b}', tileBody: ${JSON.stringify(tileBody)} }`]);
         continue;
     }
+    if (layered[id]) {
+        const body = layered[id](icon.path);
+        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${hex}', viewBox: '0 0 24 24', body: ${JSON.stringify(body)}, mono: ${JSON.stringify(icon.path)} }`]);
+        continue;
+    }
     const g = gradients[id];
     if (g) {
         const body = `<defs><linearGradient id="${id}-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${g[0]}"/><stop offset="1" stop-color="${g[1]}"/></linearGradient></defs><path fill="url(#${id}-g)" d="${icon.path}"/>`;
@@ -197,7 +229,7 @@ for (const [id, slug] of Object.entries(selection)) {
     }
     const [x0, y0, x1, y1] = svgPathBbox(icon.path);
     const box = [x0, y0, x1 - x0, y1 - y0].map(round).join(' ');
-    const extra = backing[id] ? `, backing: '${backing[id]}'` : '';
+    const extra = (backing[id] ? `, backing: '${backing[id]}'` : '') + (bold[id] ? `, bold: ${bold[id]}` : '');
     lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${hex}', path: ${JSON.stringify(icon.path)}, box: '${box}'${extra} }`]);
 }
 for (const [id, meta] of Object.entries(brand)) {

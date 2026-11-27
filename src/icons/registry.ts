@@ -39,6 +39,7 @@ const aliases: Record<string, string> = {
     website: 'web',
     mail: 'email',
     twitter: 'x',
+    woo: 'woocommerce',
 };
 
 export function findIcon(id: string | null | undefined): Icon | undefined {
