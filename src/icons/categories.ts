@@ -36,3 +36,10 @@ export const keywords: Record<string, string> = {
     bun: 'javascript runtime',
     deno: 'javascript runtime',
 };
+
+export const presets: { name: string; ids: string[] }[] = [
+    { name: 'Frontend', ids: ['nextjs', 'react', 'ts', 'tailwind', 'vite'] },
+    { name: 'Laravel', ids: ['laravel', 'php', 'mysql', 'redis', 'docker'] },
+    { name: 'Cloudflare', ids: ['cloudflare', 'workers', 'hono', 'ts', 'githubactions'] },
+    { name: 'JetBrains', ids: ['idea', 'webstorm', 'phpstorm', 'pycharm', 'goland'] },
+];

@@ -54,7 +54,11 @@ In static badges `_` is a space and `__` an underscore. When an upstream API fai
 </picture>
 ```
 
-Ids follow skillicons (`ts`, `py`, `postgres`, `idea`) and accept Simple Icons slugs as aliases. `perline=` wraps the row, 15 by default.
+Three themes: `dark` (default), `light` and `color`, where every tile takes its brand colour:
+
+![React, TypeScript, Hono, Docker, Discord](https://badges.mscode.pl/icons?i=react,ts,hono,docker,discord&theme=color)
+
+Ids follow skillicons (`ts`, `py`, `postgres`, `idea`) and accept Simple Icons slugs as aliases. `perline=` wraps the row, 15 by default. The [icon builder](https://badges.mscode.pl/#icons) lets you pick, reorder and copy a row.
 
 ## Options
 

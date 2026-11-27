@@ -102,6 +102,20 @@ describe('icons', () => {
         expect(svg).toContain('fill="#f7df1e"');
     });
 
+    it('fills tiles with the brand colour in the colour theme', () => {
+        const svg = renderIconRow([findIcon('discord')!, findIcon('webstorm')!], 'color', 15);
+        expect(svg).toContain('fill="#5865f2"');
+        expect(svg).toContain('fill="#ffffff"');
+        expect(svg).toContain('<linearGradient id="t1"');
+        expect(svg).not.toContain('stroke-opacity');
+    });
+
+    it('lets square logos fill the whole tile in every theme', () => {
+        for (const theme of ['dark', 'light', 'color'] as const) {
+            expect(renderIconRow([findIcon('ts')!], theme, 15)).toContain('clip-path="url(#c0)"');
+        }
+    });
+
     it('has no duplicate ids', () => {
         expect(new Set(iconIds()).size).toBe(iconIds().length);
     });

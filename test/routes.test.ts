@@ -54,6 +54,8 @@ describe('parseRoute', () => {
     it('parses icon lists, theme and per line count', () => {
         expect(route('/icons?i=react, ts,,hono&theme=light&perline=5')).toEqual({ kind: 'icons', ids: ['react', 'ts', 'hono'], theme: 'light', perLine: 5 });
         expect(route('/icons?i=react&perline=0')).toMatchObject({ theme: 'dark', perLine: 15 });
+        expect(route('/icons?i=react&theme=color')).toMatchObject({ theme: 'color' });
+        expect(route('/icons?i=react&theme=neon')).toMatchObject({ theme: 'dark' });
     });
 
     it('rejects unknown paths', () => {

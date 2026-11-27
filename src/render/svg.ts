@@ -51,7 +51,9 @@ function nest(viewBox: string, content: string, x: number, y: number, size: numb
 export function drawIcon(icon: Icon, x: number, y: number, size: number, options: IconOptions): string {
     const { ground, fill, spread = 1, minimum = 2 } = options;
     if ('body' in icon) {
-        const content = fill && icon.mono ? `<path fill="${fill}" fill-rule="evenodd" d="${icon.mono}"/>` : icon.body;
+        const content = fill && icon.mono
+            ? `<path fill="${fill}" fill-rule="evenodd" d="${icon.mono}"/>`
+            : fill && icon.monoBody ? `<g color="${fill}">${icon.monoBody}</g>` : icon.body;
         return nest(icon.viewBox, content, x, y, size, spread);
     }
     const backing = !fill && icon.backing ? `<rect x="2" y="2" width="20" height="20" fill="${icon.backing}"/>` : '';

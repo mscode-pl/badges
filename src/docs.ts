@@ -1,4 +1,4 @@
-import { categories, keywords } from './icons/categories';
+import { categories, keywords, presets } from './icons/categories';
 import { aliasesOf, iconIds, icons } from './icons/registry';
 import { named } from './render/colors';
 
@@ -276,6 +276,33 @@ pre { margin: 1.25rem 0 0; padding: 0.875rem 1rem; border: 1px solid var(--input
 @media (max-width: 640px) { .picker { flex-wrap: wrap; } .picker-actions { width: 100%; } .picker-actions .btn { flex: 1; } }
 .btn[data-done] { border-color: rgb(74 222 128 / 0.6); }
 .picker[data-empty] { display: none; }
+.ib { margin-top: 1.25rem; padding: 1rem; border: 1px solid var(--input); border-radius: 0.875rem; background: rgb(255 255 255 / 0.02); display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+.ib-top { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: end; }
+.ib-perline input { width: 5.5rem; }
+.ib-presets .label { font-size: 0.8125rem; font-weight: 500; color: var(--muted-fg); }
+.ib-preset-list { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.ib-hint { margin: 0; font-size: 0.875rem; color: var(--muted-fg); }
+.ib-hint kbd { font: 500 0.75rem var(--mono); border: 1px solid var(--input); border-radius: 0.3rem; padding: 0 0.35rem; }
+.ib-picked { display: grid; gap: 0.625rem; }
+.chips-row { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.chips-row:empty { display: none; }
+.chips-row li { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.25rem 0.25rem 0.3rem; border: 1px solid var(--input); border-radius: 0.7rem; background: var(--muted); cursor: grab; user-select: none; transition: border-color 150ms ease, opacity 150ms ease; }
+.chips-row li:hover { border-color: rgb(255 255 255 / 0.2); }
+.chips-row li:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.chips-row li.dragging { opacity: 0.45; border-style: dashed; }
+.chips-row li span { font: 400 0.8125rem var(--mono); }
+.chip-x { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; padding: 0; border: 0; border-radius: 0.45rem; background: transparent; color: var(--muted-fg); font-size: 1rem; line-height: 1; cursor: pointer; }
+.chip-x:hover { background: var(--accent); color: var(--fg); }
+.link { padding: 0; border: 0; background: none; color: var(--fg); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ib[data-empty] .ib-when-picked { display: none; }
+.ib:not([data-empty]) .ib-when-empty { display: none; }
+.ib-result { display: grid; gap: 0.5rem; min-width: 0; }
+.ib-result .stage span { min-height: 5rem; }
+.ib-result .stage[data-theme="dark"] .light-ground, .ib-result .stage[data-theme="color"] .light-ground, .ib-result .stage[data-theme="light"] .dark-ground { display: none; }
+.ib-result .stage img { max-width: 100%; height: auto; max-height: 7rem; }
+.ib-result .stage:not([data-theme="auto"]) { grid-template-columns: minmax(0, 1fr); }
+.picker { transition: opacity 200ms ease, transform 200ms ease; }
+.picker.near { opacity: 0; pointer-events: none; transform: translateY(0.5rem); }
 .btn-small { height: 1.875rem; padding-inline: 0.65rem; font-size: 0.8125rem; border-radius: 0.6rem; }
 .icon-group { margin-top: 1.75rem; }
 .icon-group h3 { margin: 0 0 0.5rem; font: 600 0.75rem var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--subtle); }
@@ -366,16 +393,36 @@ ${cards}
 
 <section class="card wide rise" style="--d: 520ms" id="icons" aria-labelledby="icons-title">
 <h2 id="icons-title">Icons</h2>
-<p class="intro">Rows of icons in one image, <code>/icons?i=react,ts,hono</code>. Dark by default, <code>theme=light</code> for light, <code>perline=</code> to wrap (15 by default). Sized like skillicons, so <code>height="40"</code> keeps working. Click icons to build your own row; the order you click is the order in the image.</p>
-<pre><code>${esc(picture)}</code></pre>
+<p class="intro">Rows of icons in one image, <code>/icons?i=react,ts,hono</code>. Three themes: <code>dark</code> (default), <code>light</code> and <code>color</code>, where every tile takes its brand colour. <code>perline=</code> wraps the row (15 by default). Sized like skillicons, so <code>height="40"</code> keeps working.</p>
+<div class="ib" id="ib" data-empty>
+<div class="ib-top">
+<fieldset class="field"><legend>Theme</legend><div class="segmented" id="ib-theme"><label><input type="radio" name="ib-theme" value="auto" checked><span>Auto</span></label><label><input type="radio" name="ib-theme" value="dark"><span>Dark</span></label><label><input type="radio" name="ib-theme" value="light"><span>Light</span></label><label><input type="radio" name="ib-theme" value="color"><span>Color</span></label></div></fieldset>
+<div class="field ib-perline"><label for="ib-perline">Per line</label><input id="ib-perline" type="number" min="1" max="50" value="15" inputmode="numeric"></div>
+<div class="field ib-presets"><span class="label">Start from</span><div class="ib-preset-list">${presets.map((p) => `<button type="button" class="btn btn-small" data-preset="${p.ids.join(',')}">${esc(p.name)}</button>`).join('')}</div></div>
+</div>
+<div class="ib-picked">
+<p class="ib-hint ib-when-empty">Nothing picked yet. Click icons below, search with <kbd>/</kbd>, or start from a preset.</p>
+<ol class="chips-row" id="ib-list" aria-label="Your icons, in order"></ol>
+<p class="ib-hint ib-when-picked">Drag to reorder, or focus an icon and use the arrow keys. <button type="button" class="link" id="ib-clear">Clear all</button></p>
+</div>
+<div class="ib-when-picked ib-result">
+<div class="stage" id="ib-stage"><span class="dark-ground"><img id="ib-dark" alt="Your row on dark"></span><span class="light-ground"><img id="ib-light" alt="Your row on light"></span></div>
+<p class="eyebrow" id="ib-html-label">HTML with light and dark</p>
+<div class="row"><code id="ib-html"></code><button type="button" class="copy" id="ib-copy-html" aria-label="Copy HTML" title="Copy">${copyIcon}</button></div>
+<p class="eyebrow">Markdown</p>
+<div class="row"><code id="ib-md"></code><button type="button" class="copy" id="ib-copy-md" aria-label="Copy Markdown" title="Copy">${copyIcon}</button></div>
+<p class="eyebrow">Link to this row</p>
+<div class="row"><code id="ib-link"></code><button type="button" class="copy" id="ib-copy-link" aria-label="Copy link" title="Copy">${copyIcon}</button></div>
+</div>
+</div>
 <div class="search">${searchIcon}<input id="icon-search" type="search" placeholder="Search ${ids.length} icons, e.g. laravel, database, jetbrains" aria-label="Search icons" autocomplete="off" spellcheck="false"><kbd>/</kbd></div>
 <div id="icon-groups">${iconGroups}</div>
+<p class="empty" id="icon-empty" hidden>No icons match. Missing one? <a href="https://github.com/mscode-pl/badges/issues">Ask for it on GitHub</a>.</p>
 <div class="picker" id="picker" data-empty aria-live="polite">
 <span class="picker-count"><strong id="pick-count">0</strong> picked</span>
-<span class="picker-preview"><img id="pick-dark" alt="Your row"></span>
-<span class="picker-actions"><button type="button" class="btn btn-small btn-primary" id="pick-copy-html" title="Picture tag with light and dark variants">Copy HTML</button><button type="button" class="btn btn-small" id="pick-copy-md">Copy Markdown</button><button type="button" class="btn btn-small" id="pick-clear">Clear</button></span>
+<span class="picker-preview"><img id="pick-img" alt="Your row"></span>
+<span class="picker-actions"><button type="button" class="btn btn-small btn-primary" id="pick-copy">Copy HTML</button><a class="btn btn-small" href="#ib">Edit row</a></span>
 </div>
-<p class="empty" id="icon-empty" hidden>No icons match. Missing one? <a href="https://github.com/mscode-pl/badges/issues">Ask for it on GitHub</a>.</p>
 </section>
 </div>
 </main>
@@ -421,24 +468,54 @@ form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(b
 form.addEventListener('submit', (e) => e.preventDefault());
 document.querySelectorAll('.swatch').forEach((b) => b.addEventListener('click', () => { form.color.value = b.dataset.color; build(); }));
 build();
-const picked = [];
+const ib = document.getElementById('ib');
+const list = document.getElementById('ib-list');
 const picker = document.getElementById('picker');
-function renderPick() {
+const known = new Set([...document.querySelectorAll('.icon[data-id]')].map((b) => b.dataset.id));
+const picked = (new URLSearchParams(location.search).get('i') || '').split(',').map((s) => s.trim().toLowerCase()).filter((id) => known.has(id));
+const themeOf = () => document.querySelector('input[name="ib-theme"]:checked').value;
+const perLine = () => Math.min(50, Math.max(1, parseInt(document.getElementById('ib-perline').value, 10) || 15));
+let gridTheme = 'dark';
+function setCopy(id, text) { document.getElementById(id).dataset.copy = text; }
+function renderPick(keepList) {
+  const theme = themeOf();
+  const tileTheme = theme === 'auto' ? 'dark' : theme;
+  if (tileTheme !== gridTheme) {
+    gridTheme = tileTheme;
+    document.querySelectorAll('.icon[data-id] img').forEach((img) => { img.src = '/icons?i=' + img.closest('.icon').dataset.id + '&theme=' + tileTheme; });
+  }
   document.querySelectorAll('.icon[data-id]').forEach((b) => {
     const at = picked.indexOf(b.dataset.id);
     b.setAttribute('aria-pressed', at >= 0 ? 'true' : 'false');
     if (at >= 0) b.dataset.order = String(at + 1); else delete b.dataset.order;
   });
+  if (!keepList) list.innerHTML = picked.map((id, i) => '<li draggable="true" tabindex="0" data-id="' + id + '" aria-label="' + id + ', position ' + (i + 1) + '"><img src="/icons?i=' + id + '&theme=' + tileTheme + '" alt="" width="28" height="28"><span>' + id + '</span><button type="button" class="chip-x" aria-label="Remove ' + id + '">&times;</button></li>').join('');
   document.getElementById('pick-count').textContent = String(picked.length);
-  if (!picked.length) { picker.setAttribute('data-empty', ''); return; }
-  picker.removeAttribute('data-empty');
-  const path = '/icons?i=' + picked.join(',');
-  document.getElementById('pick-dark').src = path + '&theme=dark';
+  history.replaceState(null, '', location.pathname + (picked.length ? '?i=' + picked.join(',') : '') + location.hash);
+  ib.toggleAttribute('data-empty', !picked.length);
+  picker.toggleAttribute('data-empty', !picked.length);
+  if (!picked.length) return;
+  const line = perLine();
+  const base = '/icons?i=' + picked.join(',') + (line !== 15 ? '&perline=' + line : '');
+  const themed = (t) => base + (t === 'dark' ? '' : '&theme=' + t);
   const alt = picked.join(', ');
-  const html = '<picture><source media="(prefers-color-scheme: dark)" srcset="' + origin + path + '&theme=dark"><img src="' + origin + path + '&theme=light" alt="' + alt + '" height="40"></picture>';
-  const md = '![' + alt + '](' + origin + path + ')';
-  document.getElementById('pick-copy-html').dataset.copy = html;
-  document.getElementById('pick-copy-md').dataset.copy = md;
+  document.getElementById('ib-stage').dataset.theme = theme;
+  document.getElementById('ib-dark').src = themed(tileTheme);
+  document.getElementById('ib-light').src = themed('light');
+  const html = theme === 'auto'
+    ? '<picture><source media="(prefers-color-scheme: dark)" srcset="' + origin + themed('dark') + '"><img src="' + origin + themed('light') + '" alt="' + alt + '" height="40"></picture>'
+    : '<img src="' + origin + themed(theme) + '" alt="' + alt + '" height="40">';
+  const md = '![' + alt + '](' + origin + themed(tileTheme) + ')';
+  const link = origin + '/?i=' + picked.join(',') + '#icons';
+  document.getElementById('ib-html-label').textContent = theme === 'auto' ? 'HTML with light and dark' : 'HTML';
+  document.getElementById('ib-html').textContent = html;
+  document.getElementById('ib-md').textContent = md;
+  document.getElementById('ib-link').textContent = link;
+  setCopy('ib-copy-html', html);
+  setCopy('ib-copy-md', md);
+  setCopy('ib-copy-link', link);
+  setCopy('pick-copy', html);
+  document.getElementById('pick-img').src = '/icons?i=' + picked.join(',') + '&perline=50' + (tileTheme === 'dark' ? '' : '&theme=' + tileTheme);
 }
 document.getElementById('icon-groups').addEventListener('click', (event) => {
   const button = event.target.closest('.icon[data-id]');
@@ -447,7 +524,69 @@ document.getElementById('icon-groups').addEventListener('click', (event) => {
   if (at >= 0) picked.splice(at, 1); else picked.push(button.dataset.id);
   renderPick();
 });
-document.getElementById('pick-clear').addEventListener('click', () => { picked.length = 0; renderPick(); });
+document.getElementById('ib-clear').addEventListener('click', () => { picked.length = 0; renderPick(); });
+document.querySelectorAll('[data-preset]').forEach((b) => b.addEventListener('click', () => { picked.splice(0, picked.length, ...b.dataset.preset.split(',')); renderPick(); }));
+document.getElementById('ib-theme').addEventListener('change', () => renderPick());
+document.getElementById('ib-perline').addEventListener('input', () => renderPick());
+list.addEventListener('click', (event) => {
+  const x = event.target.closest('.chip-x');
+  if (!x) return;
+  picked.splice(picked.indexOf(x.closest('li').dataset.id), 1);
+  renderPick();
+});
+function move(id, to) {
+  const from = picked.indexOf(id);
+  if (from < 0 || to < 0 || to >= picked.length || to === from) return false;
+  picked.splice(to, 0, picked.splice(from, 1)[0]);
+  renderPick();
+  return true;
+}
+list.addEventListener('keydown', (event) => {
+  const li = event.target.closest('li[data-id]');
+  if (!li || event.target !== li) return;
+  const id = li.dataset.id;
+  const at = picked.indexOf(id);
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    if (move(id, at + (event.key === 'ArrowLeft' ? -1 : 1))) list.querySelector('li[data-id="' + id + '"]').focus();
+  } else if (event.key === 'Delete' || event.key === 'Backspace') {
+    event.preventDefault();
+    picked.splice(at, 1);
+    renderPick();
+    const next = list.children[Math.min(at, list.children.length - 1)];
+    if (next) next.focus();
+  }
+});
+let dragging = null;
+list.addEventListener('dragstart', (event) => {
+  const li = event.target.closest('li[data-id]');
+  if (!li) return;
+  dragging = li.dataset.id;
+  li.classList.add('dragging');
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', dragging);
+});
+list.addEventListener('dragover', (event) => {
+  if (!dragging) return;
+  event.preventDefault();
+  const li = event.target.closest('li[data-id]');
+  if (!li || li.dataset.id === dragging) return;
+  const box = li.getBoundingClientRect();
+  const target = picked.indexOf(li.dataset.id);
+  const from = picked.indexOf(dragging);
+  let to = event.clientX > box.left + box.width / 2 ? target + 1 : target;
+  if (from < to) to--;
+  if (to === from) return;
+  // Move the node itself: re-rendering would detach the dragged element and its dragend would never arrive.
+  picked.splice(to, 0, picked.splice(from, 1)[0]);
+  const nodes = new Map([...list.children].map((node) => [node.dataset.id, node]));
+  picked.forEach((id, i) => { const node = nodes.get(id); node.setAttribute('aria-label', id + ', position ' + (i + 1)); list.appendChild(node); });
+  renderPick(true);
+});
+list.addEventListener('drop', (event) => event.preventDefault());
+list.addEventListener('dragend', () => { dragging = null; list.querySelectorAll('.dragging').forEach((li) => li.classList.remove('dragging')); });
+new IntersectionObserver(([entry]) => picker.classList.toggle('near', entry.isIntersecting)).observe(ib);
+renderPick();
 
 const search = document.getElementById('icon-search');
 search.addEventListener('input', () => {

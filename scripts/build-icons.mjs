@@ -138,11 +138,11 @@ const backing = {
 
 // Multi-colour logos Simple Icons does not carry, from Wikimedia Commons (public domain) and przelewy24.pl.
 const brand = {
-    php: { title: 'PHP', hex: '#777bb4' },
-    vscode: { title: 'Visual Studio Code', hex: '#007acc' },
-    linkedin: { title: 'LinkedIn', hex: '#0a66c2', mono: true },
-    przelewy24: { title: 'Przelewy24', hex: '#d13239' },
-    inpost: { title: 'InPost', hex: '#ffcb04' },
+    php: { title: 'PHP', hex: '#777bb4', mono: 'none' },
+    vscode: { title: 'Visual Studio Code', hex: '#007acc', mono: 'cutout' },
+    linkedin: { title: 'LinkedIn', hex: '#007ebb', mono: 'cutout', full: true },
+    przelewy24: { title: 'Przelewy24', hex: '#d13239', mono: 'recolor' },
+    inpost: { title: 'InPost', hex: '#ffcb04', mono: 'cutout' },
 };
 
 function sanitize(id, source) {
@@ -166,9 +166,10 @@ function sanitize(id, source) {
         .trim();
     if (/<script|\son\w+=|javascript:|<foreignObject|href="http/i.test(body)) throw new Error(`unsafe markup in ${id}`);
     if (inherited) body = `<g ${inherited}>${body}</g>`;
-    // One-colour version for coloured buttons: every shape merged, overlaps cut out.
+    // One-colour versions for coloured grounds: every path merged with overlaps cut out, or every fill set to currentColor.
     const mono = [...body.matchAll(/<path\b[^>]*\sd="([^"]*)"/g)].map((m) => m[1]).join(' ');
-    return { viewBox, body, mono };
+    const recolored = body.replace(/\s(fill|stroke)="(?!none)[^"]*"/g, ' $1="currentColor"');
+    return { viewBox, body, mono, recolored };
 }
 
 const round = (v) => Math.round(v * 100) / 100;
@@ -184,13 +185,14 @@ for (const [id, slug] of Object.entries(selection)) {
         const defs = pairs.map(([from, to], i) => `<linearGradient id="${id}-g${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient>`).join('');
         const shapes = jetbrainsShapes.map((points, i) => `<polygon fill="url(#${id}-g${i})" points="${points}"/>`).join('');
         const body = `<defs>${defs}</defs><g transform="rotate(${ide.turn} 35 35)">${shapes}</g><rect x="17" y="17" width="36" height="36" fill="#ffffff"/><path fill="#000000" transform="translate(15 15) scale(1.6667)" d="${icon.path}"/>`;
-        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${a}', viewBox: '0 0 70 70', body: ${JSON.stringify(body)} }`]);
+        const tileBody = `<rect x="2" y="2" width="20" height="20" fill="#ffffff"/><path fill="#000000" d="${icon.path}"/>`;
+        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${a}', viewBox: '0 0 70 70', body: ${JSON.stringify(body)}, tile: '${a},${b}', tileBody: ${JSON.stringify(tileBody)} }`]);
         continue;
     }
     const g = gradients[id];
     if (g) {
         const body = `<defs><linearGradient id="${id}-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${g[0]}"/><stop offset="1" stop-color="${g[1]}"/></linearGradient></defs><path fill="url(#${id}-g)" d="${icon.path}"/>`;
-        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${g[1]}', viewBox: '0 0 24 24', body: ${JSON.stringify(body)}, mono: ${JSON.stringify(icon.path)} }`]);
+        lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${g[1]}', viewBox: '0 0 24 24', body: ${JSON.stringify(body)}, mono: ${JSON.stringify(icon.path)}, tile: '${g[0]},${g[1]}' }`]);
         continue;
     }
     const [x0, y0, x1, y1] = svgPathBbox(icon.path);
@@ -199,8 +201,8 @@ for (const [id, slug] of Object.entries(selection)) {
     lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${hex}', path: ${JSON.stringify(icon.path)}, box: '${box}'${extra} }`]);
 }
 for (const [id, meta] of Object.entries(brand)) {
-    const { viewBox, body, mono } = sanitize(id, fs.readFileSync(new URL(`../icons/brand/${id}.svg`, import.meta.url), 'utf8'));
-    const monoField = meta.mono ? `, mono: ${JSON.stringify(mono)}` : '';
+    const { viewBox, body, mono, recolored } = sanitize(id, fs.readFileSync(new URL(`../icons/brand/${id}.svg`, import.meta.url), 'utf8'));
+    const monoField = (meta.mono === 'cutout' ? `, mono: ${JSON.stringify(mono)}` : meta.mono === 'recolor' ? `, monoBody: ${JSON.stringify(recolored)}` : '') + (meta.full ? ', full: true' : '');
     lines.push([id, `{ title: ${JSON.stringify(meta.title)}, hex: '${meta.hex}', viewBox: '${viewBox}', body: ${JSON.stringify(body)}${monoField} }`]);
 }
 lines.sort(([a], [b]) => a.localeCompare(b));

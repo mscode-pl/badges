@@ -3,6 +3,7 @@ import { npmDownloads, npmLicense, npmVersion } from './adapters/npm';
 import { packagistDownloads, packagistLicense, packagistVersion } from './adapters/packagist';
 import type { BadgeData, Context } from './adapters/types';
 import type { Style, Theme } from './render/badge';
+import type { IconTheme } from './render/icons';
 
 export interface Options {
     theme: Theme;
@@ -17,7 +18,7 @@ export type Route =
     | { kind: 'docs' }
     | { kind: 'static'; label?: string; message: string; color?: string; options: Options }
     | { kind: 'live'; fallbackLabel: string; load: (ctx: Context) => Promise<BadgeData>; options: Options }
-    | { kind: 'icons'; ids: string[]; theme: Theme; perLine: number }
+    | { kind: 'icons'; ids: string[]; theme: IconTheme; perLine: number }
     | { kind: 'not-found' };
 
 // Same escaping as shields.io: "_" is a space and "__" a literal underscore.
@@ -95,7 +96,7 @@ export function parseRoute(url: URL): Route {
         return {
             kind: 'icons',
             ids,
-            theme: query.get('theme') === 'light' ? 'light' : 'dark',
+            theme: iconTheme(query.get('theme')),
             perLine: Number.isInteger(perLine) && perLine > 0 && perLine <= 50 ? perLine : 15,
         };
     }
@@ -108,4 +109,8 @@ export function parseRoute(url: URL): Route {
     }
 
     return { kind: 'not-found' };
+}
+
+function iconTheme(value: string | null): IconTheme {
+    return value === 'light' || value === 'color' ? value : 'dark';
 }
