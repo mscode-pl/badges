@@ -4,6 +4,7 @@ import { npmDownloads, npmLicense, npmVersion } from '../src/adapters/npm';
 import { packagistDownloads, packagistLicense, packagistVersion } from '../src/adapters/packagist';
 import { compactNumber } from '../src/adapters/format';
 import type { Context } from '../src/adapters/types';
+import { codingTime, wakaTime, wakapiSource, wakatimeSource } from '../src/adapters/wakatime';
 import { handle } from '../src/index';
 
 function mock(routes: Record<string, unknown>, token?: string) {
@@ -148,5 +149,59 @@ describe('handle', () => {
 describe('compactNumber', () => {
     it('shortens large numbers', () => {
         expect([0, 999, 1000, 1540, 12345, 1_250_000, 3_000_000_000].map(compactNumber)).toEqual(['0', '999', '1k', '1.5k', '12k', '1.3M', '3B']);
+    });
+});
+
+describe('wakatime and wakapi', () => {
+    it('formats coding time', () => {
+        expect(codingTime(59)).toBe('1 min');
+        expect(codingTime(3 * 3600 + 5 * 60)).toBe('3 hrs 5 mins');
+        expect(codingTime(1234 * 3600)).toBe('1,234 hrs');
+    });
+
+    it('reads all-time and ranged WakaTime stats', async () => {
+        const { ctx } = mock({
+            'https://wakatime.com/api/v1/users/mati/all_time_since_today': { data: { total_seconds: 500 * 3600 } },
+            'https://wakatime.com/api/v1/users/mati/stats/last_7_days': {
+                data: { total_seconds: 7200, languages: [{ name: 'TypeScript', total_seconds: 3600 }] },
+            },
+        });
+        expect(await wakaTime(ctx, wakatimeSource, 'mati', 'all_time')).toEqual({ label: 'wakatime', message: '500 hrs' });
+        expect(await wakaTime(ctx, wakatimeSource, 'mati', 'last_7_days')).toEqual({ label: 'wakatime', message: '2 hrs' });
+        expect(await wakaTime(ctx, wakatimeSource, 'mati', 'last_7_days', 'typescript')).toEqual({ label: 'TypeScript', message: '1 hr' });
+    });
+
+    it('talks to a Wakapi instance through its WakaTime API, mapping the year range', async () => {
+        const source = wakapiSource('https://waka.example.com/sub/')!;
+        const { ctx, calls } = mock({ 'https://waka.example.com/sub/api/compat/wakatime/v1/users/mati/stats/last_12_months': { data: { total_seconds: 60 } } });
+        expect(await wakaTime(ctx, source, 'mati', 'last_year')).toEqual({ label: 'wakapi', message: '1 min' });
+        expect(calls).toHaveLength(1);
+        expect(wakapiSource(null)?.base).toBe('https://wakapi.dev/api/compat/wakatime/v1');
+    });
+
+    it('refuses Wakapi instances that are not public https hosts', () => {
+        for (const bad of ['http://waka.example.com', 'localhost', '127.0.0.1', '10.0.0.2', 'waka.internal', 'https://a:b@waka.dev', 'waka.dev:8443']) {
+            expect(wakapiSource(bad)).toBeUndefined();
+        }
+    });
+});
+
+describe('views', () => {
+    function counter() {
+        let count = 0;
+        const stub = { fetch: async (_: string, init?: RequestInit) => { if (init?.method === 'POST') count++; return Response.json({ count }); } };
+        return { idFromName: (name: string) => name, get: () => stub } as unknown as DurableObjectNamespace;
+    }
+
+    it('counts every view and is never cached', async () => {
+        const env = { VIEWS: counter() };
+        await handle(new Request('https://badges.mscode.pl/views/msikorski26'), env);
+        const res = await handle(new Request('https://badges.mscode.pl/views/msikorski26?base=1000'), env);
+        expect(await res.text()).toContain('<title>profile views: 1,002</title>');
+        expect(res.headers.get('cache-control')).toContain('no-store');
+    });
+
+    it('rejects odd counter names', async () => {
+        expect((await handle(new Request('https://badges.mscode.pl/views/..%2Fx'), { VIEWS: counter() })).status).toBe(404);
     });
 });

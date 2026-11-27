@@ -2,8 +2,10 @@ import { githubLicense, githubStars, githubWorkflow } from './adapters/github';
 import { npmDownloads, npmLicense, npmVersion } from './adapters/npm';
 import { packagistDownloads, packagistLicense, packagistVersion } from './adapters/packagist';
 import type { BadgeData, Context } from './adapters/types';
+import { wakaRange, wakaTime, wakapiSource, wakatimeSource } from './adapters/wakatime';
 import type { Style, Theme } from './render/badge';
 import type { IconTheme } from './render/icons';
+import { viewName } from './views';
 
 export interface Options {
     theme: Theme;
@@ -19,6 +21,7 @@ export type Route =
     | { kind: 'static'; label?: string; message: string; color?: string; options: Options }
     | { kind: 'live'; fallbackLabel: string; load: (ctx: Context) => Promise<BadgeData>; options: Options }
     | { kind: 'icons'; ids: string[]; theme: IconTheme; perLine: number }
+    | { kind: 'views'; name: string; base: number; options: Options }
     | { kind: 'not-found' };
 
 // Same escaping as shields.io: "_" is a space and "__" a literal underscore.
@@ -99,6 +102,24 @@ export function parseRoute(url: URL): Route {
             theme: iconTheme(query.get('theme')),
             perLine: Number.isInteger(perLine) && perLine > 0 && perLine <= 50 ? perLine : 15,
         };
+    }
+
+    if (parts[0] === 'views' && parts.length === 2) {
+        const name = safeDecode(parts[1]!);
+        const base = Number(query.get('base') ?? 0);
+        if (viewName.test(name)) {
+            return { kind: 'views', name: name.toLowerCase(), base: Number.isInteger(base) && base > 0 ? base : 0, options: options(query) };
+        }
+        return { kind: 'not-found' };
+    }
+
+    if ((parts[0] === 'wakatime' || parts[0] === 'wakapi') && (parts.length === 2 || parts.length === 3)) {
+        const source = parts[0] === 'wakatime' ? wakatimeSource : wakapiSource(query.get('instance'));
+        const range = wakaRange(parts[2]);
+        const user = safeDecode(parts[1]!);
+        const language = query.get('lang') ?? query.get('language') ?? undefined;
+        if (!source || !range) return { kind: 'not-found' };
+        return { kind: 'live', fallbackLabel: source.label, load: (ctx) => wakaTime(ctx, source, user, range, language), options: options(query) };
     }
 
     const key = parts.slice(0, 2).join('/');

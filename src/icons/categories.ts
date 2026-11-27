@@ -9,7 +9,7 @@ export const categories: { name: string; ids: string[] }[] = [
     },
     {
         name: 'Tools and editors',
-        ids: ['git', 'github', 'gitlab', 'vscode', 'webstorm', 'phpstorm', 'goland', 'pycharm', 'idea', 'jetbrains', 'figma', 'postman', 'npm', 'pnpm', 'yarn', 'composer', 'packagist', 'vitest', 'jest', 'eslint', 'prettier', 'notion', 'linear'],
+        ids: ['git', 'github', 'gitlab', 'vscode', 'webstorm', 'phpstorm', 'goland', 'pycharm', 'idea', 'jetbrains', 'figma', 'postman', 'npm', 'pnpm', 'yarn', 'composer', 'packagist', 'vitest', 'jest', 'eslint', 'prettier', 'notion', 'linear', 'wakatime'],
     },
     { name: 'Commerce and payments', ids: ['stripe', 'przelewy24', 'inpost', 'shopify', 'woocommerce', 'medusa', 'wordpress', 'strapi'] },
     { name: 'AI', ids: ['claude', 'anthropic'] },

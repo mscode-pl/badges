@@ -7,9 +7,12 @@ import { named, parseColor } from './render/colors';
 import { renderIconRow } from './render/icons';
 import { parseRoute, type Options } from './routes';
 
+export { ViewCounter } from './views';
+
 export interface Env {
     GITHUB_TOKEN?: string;
     CF_VERSION_METADATA?: { id: string };
+    VIEWS?: DurableObjectNamespace;
 }
 
 const seconds = { static: 3600, live: 900, error: 120 };
@@ -18,7 +21,8 @@ function svg(body: string, maxAge: number): Response {
     return new Response(body, {
         headers: {
             'content-type': 'image/svg+xml; charset=utf-8',
-            'cache-control': `public, max-age=${maxAge}, s-maxage=${maxAge}`,
+            // Counters must never be cached, or GitHub's image proxy would freeze the number.
+            'cache-control': maxAge > 0 ? `public, max-age=${maxAge}, s-maxage=${maxAge}` : 'no-cache, no-store, must-revalidate, max-age=0',
             'access-control-allow-origin': '*',
             'x-content-type-options': 'nosniff',
             'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'",
@@ -72,6 +76,15 @@ export async function handle(request: Request, env: Env, fetcher: Fetcher = glob
             }
         }
 
+        case 'views': {
+            if (!env.VIEWS) return svg(badge({ label: 'views', message: 'unavailable', color: named.inactive }, route.options, named.inactive!), 0);
+            const stub = env.VIEWS.get(env.VIEWS.idFromName(route.name));
+            const res = await stub.fetch('https://views/count', { method: request.method === 'HEAD' ? 'GET' : 'POST' });
+            const { count } = (await res.json()) as { count: number };
+            const data = { label: 'profile views', message: (count + route.base).toLocaleString('en-US') };
+            return svg(badge(data, route.options, named.blue!), 0);
+        }
+
         case 'icons': {
             const list = route.ids.map(findIcon).filter((icon): icon is Icon => Boolean(icon));
             if (!list.length) {
@@ -107,7 +120,8 @@ export default {
             const body = renderBadge({ label: 'badge', message: 'error', color: named.inactive!, theme: 'light', style: 'flat' });
             return new Response(body, { status: 500, headers: { 'content-type': 'image/svg+xml; charset=utf-8', 'cache-control': 'no-store' } });
         }
-        if (response.ok && response.headers.get('content-type')?.startsWith('image/svg+xml')) {
+        const cacheable = !response.headers.get('cache-control')?.includes('no-store');
+        if (response.ok && cacheable && response.headers.get('content-type')?.startsWith('image/svg+xml')) {
             ctx.waitUntil(cache.put(key, response.clone()));
         }
         return response;

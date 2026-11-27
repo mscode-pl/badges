@@ -105,6 +105,7 @@ const selection = {
     x: 'x',
     tiktok: 'tiktok',
     gmail: 'gmail',
+    wakatime: 'wakatime',
     chrome: 'googlechrome',
     claude: 'claude',
     anthropic: 'anthropic',

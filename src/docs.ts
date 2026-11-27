@@ -66,6 +66,15 @@ const groups: Group[] = [
             { title: 'License', path: '/github/license/mscode-pl/email-lint', alt: 'License' },
         ],
     },
+    {
+        id: 'profile',
+        title: 'Profile',
+        intro: '<code>/views/&lt;name&gt;</code> counts every view of your profile README and is never cached; <code>?base=</code> adds a starting number when you move from another counter. <code>/wakatime/&lt;user&gt;</code> shows your coding time (stats must be public); add a range after the user: <code>7d</code>, <code>30d</code>, <code>6m</code>, <code>1y</code> or <code>all</code>, and <code>?lang=TypeScript</code> for one language. <code>/wakapi/&lt;user&gt;</code> works the same for Wakapi, on wakapi.dev or your own instance with <code>?instance=wakapi.example.com</code>.',
+        examples: [
+            { title: 'Profile views', path: '/views/mscode-badges-demo', alt: 'Profile views' },
+            { title: 'With an icon and a start', path: '/views/mscode-badges-demo?icon=github&color=gray&base=1000', alt: 'Profile views' },
+        ],
+    },
 ];
 
 const options: [string, string][] = [
@@ -350,12 +359,13 @@ footer nav { display: flex; gap: 1rem; }
 <p class="lead">Static and live badges for npm, Packagist and GitHub, profile buttons and tech icon rows. Light and dark, drawn as vector paths so they look the same everywhere. Free, no sign-up.</p>
 </div>
 <ul class="chips rise" style="--d: 60ms" aria-label="Features">
-<li>Light and dark</li><li>npm</li><li>Packagist</li><li>GitHub Actions</li><li>${ids.length} icons</li><li>MIT</li>
+<li>Light and dark</li><li>npm</li><li>Packagist</li><li>GitHub Actions</li><li>Profile views</li><li>WakaTime</li><li>${ids.length} icons</li><li>MIT</li>
 </ul>
 <nav class="jump rise" style="--d: 100ms" aria-label="Sections">
 <a class="btn btn-primary" href="#builder">Make a badge</a>
 <a class="btn" href="#static">Badges</a>
 <a class="btn" href="#icons">Icons</a>
+<a class="btn" href="#profile">Profile</a>
 <a class="btn" href="#options">Options</a>
 </nav>
 

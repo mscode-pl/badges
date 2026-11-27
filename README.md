@@ -29,7 +29,7 @@
 
 ## Why
 
-shields.io and skillicons.dev are great, but they come in two different looks, and skillicons has no Hono, Caddy, Traefik, GoLand, Stripe, Strapi, Przelewy24 or InPost. Here badges, buttons and icons share one style, every badge has a light and a dark variant for `<picture>`, and the text is drawn as paths, so widths are exact and nothing gets clipped on machines without the fonts.
+shields.io, skillicons.dev and the profile view counters are great, but they come in different looks, and skillicons has no Hono, Caddy, Traefik, GoLand, Stripe, Strapi, Przelewy24 or InPost. Here badges, buttons and icons share one style, every badge has a light and a dark variant for `<picture>`, and the text is drawn as paths, so widths are exact and nothing gets clipped on machines without the fonts.
 
 ## Badges
 
@@ -42,8 +42,11 @@ The page at [badges.mscode.pl](https://badges.mscode.pl) has a badge maker and e
 | Packagist version, downloads, license | `/packagist/v/<vendor>/<package>`, `/packagist/dt/...` (also `dm`, `dd`), `/packagist/l/...` |
 | GitHub Actions | `/github/actions/<owner>/<repo>/<workflow file>?branch=master` |
 | GitHub stars, license | `/github/stars/<owner>/<repo>`, `/github/license/<owner>/<repo>` |
+| Profile views | `/views/<name>`, `?base=1000` to start from a number. Never cached, so every view counts |
+| WakaTime coding time | `/wakatime/<user>`, or with a range: `/wakatime/<user>/7d` (also `30d`, `6m`, `1y`, `all`), `?lang=TypeScript` for one language |
+| Wakapi coding time | `/wakapi/<user>` on wakapi.dev, `?instance=wakapi.example.com` for your own instance. Same ranges and `lang` |
 
-In static badges `_` is a space and `__` an underscore. When an upstream API fails, the badge says `unknown` instead of breaking the image.
+In static badges `_` is a space and `__` an underscore. WakaTime and Wakapi only answer for users whose stats are public. When an upstream API fails, the badge says `unknown` instead of breaking the image.
 
 ## Icons
 
