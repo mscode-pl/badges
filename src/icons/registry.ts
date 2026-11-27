@@ -1,13 +1,5 @@
-import { simpleIcons } from './simple.generated';
+import { generatedIcons } from './generated';
 import type { Icon } from './types';
-
-// Simple Icons does not carry these marks for trademark reasons, so they render as lettered tiles in the brand color.
-const monograms: Record<string, Icon> = {
-    vscode: { title: 'Visual Studio Code', hex: '#0078d4', monogram: 'VS' },
-    linkedin: { title: 'LinkedIn', hex: '#0a66c2', monogram: 'in' },
-    przelewy24: { title: 'Przelewy24', hex: '#d13239', monogram: 'P24' },
-    inpost: { title: 'InPost', hex: '#ffcd00', monogram: 'IP' },
-};
 
 const drawn: Record<string, Icon> = {
     web: {
@@ -22,7 +14,7 @@ const drawn: Record<string, Icon> = {
     },
 };
 
-export const icons: Record<string, Icon> = { ...simpleIcons, ...monograms, ...drawn };
+export const icons: Record<string, Icon> = { ...generatedIcons, ...drawn };
 
 const aliases: Record<string, string> = {
     next: 'nextjs',

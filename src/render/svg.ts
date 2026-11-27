@@ -1,6 +1,5 @@
 import type { Icon } from '../icons/types';
-import { contrast, ink, luminance, textOn } from './colors';
-import { measure, textPath } from './text';
+import { contrast, ink, luminance } from './colors';
 
 export function escapeXml(value: string): string {
     return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -33,16 +32,14 @@ export function markColor(mark: string, ground: string, minimum = 2): string {
     return target;
 }
 
-export function drawIcon(icon: Icon, x: number, y: number, size: number, ground: string, fill?: string): string {
-    if ('monogram' in icon) {
-        const fontSize = Math.min(size * 0.5, (size * 0.78) / Math.max(1, measure('display', icon.monogram, 1)));
-        const width = measure('display', icon.monogram, fontSize);
-        const tx = x + (size - width) / 2;
-        const ty = y + size / 2 + fontSize * 0.36;
-        const tileFill = fill ?? icon.hex;
-        const letters = fill ? ground : textOn(icon.hex);
-        return `<rect x="${n(x)}" y="${n(y)}" width="${n(size)}" height="${n(size)}" rx="${n(size * 0.22)}" fill="${tileFill}"/>`
-            + `<path fill="${letters}" d="${textPath('display', icon.monogram, fontSize, tx, ty)}"/>`;
+// Wide logos such as Przelewy24 may spread past the square box by `spread`, so they stay legible in a tile.
+export function drawIcon(icon: Icon, x: number, y: number, size: number, ground: string, fill?: string, spread = 1): string {
+    if ('body' in icon) {
+        const [, , vw = 1, vh = 1] = icon.viewBox.split(' ').map(Number);
+        const aspect = vw / vh;
+        const w = Math.min(size * spread, size * Math.max(1, aspect));
+        const h = Math.min(size, w / aspect);
+        return `<svg x="${n(x + (size - w) / 2)}" y="${n(y + (size - h) / 2)}" width="${n(w)}" height="${n(h)}" viewBox="${icon.viewBox}" overflow="visible">${icon.body}</svg>`;
     }
     const scale = size / 24;
     return `<path fill="${fill ?? markColor(icon.hex, ground)}" transform="translate(${n(x)} ${n(y)}) scale(${n(scale)})" d="${icon.path}"/>`;
