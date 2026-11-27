@@ -85,7 +85,7 @@ MIT. Badges are free to use anywhere, no attribution needed.
 
 ## Credits
 
-Badge fonts: [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), copies in `fonts/`. Page fonts: [Geist](https://github.com/vercel/geist-font) and [Outfit](https://github.com/Outfitio/Outfit-Fonts), copies in `public/fonts/`. All under the SIL Open Font License. Brand icons: [Simple Icons](https://simpleicons.org), CC0. Logos remain trademarks of their owners.
+Badge fonts: [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), copies in `fonts/`. Page fonts: [Geist](https://github.com/vercel/geist-font) and [Outfit](https://github.com/Outfitio/Outfit-Fonts), copies in `public/fonts/`. All under the SIL Open Font License. Brand icons: [Simple Icons](https://simpleicons.org), CC0. PHP, Visual Studio Code, LinkedIn and InPost logos from Wikimedia Commons (public domain), Przelewy24 from przelewy24.pl, sources in `icons/brand/`. Logos remain trademarks of their owners.
 
 ---
 

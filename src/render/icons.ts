@@ -24,7 +24,7 @@ export function renderIconRow(list: Icon[], theme: Theme, perLine: number): stri
         const y = Math.floor(i / columns) * (tile + gap);
         return `<g><title>${escapeXml(icon.title)}</title>`
             + `<rect x="${x + 2}" y="${y + 2}" width="${tile - 4}" height="${tile - 4}" rx="58" fill="${ground.bg}" stroke="${ground.stroke}" stroke-opacity="${ground.opacity}" stroke-width="4"/>`
-            + drawIcon(icon, x + offset, y + offset, mark, ground.bg)
+            + drawIcon(icon, x + offset, y + offset, mark, ground.bg, undefined, 1.55)
             + '</g>';
     }).join('');
 

@@ -81,6 +81,14 @@ describe('icons', () => {
         expect(svg.match(/<rect/g)?.length).toBe(5);
     });
 
+    it('nests multi-colour logos with ids prefixed per icon', () => {
+        const svg = renderIconRow(['php', 'vscode', 'inpost'].map((id) => findIcon(id)!), 'dark', 15);
+        expect(svg).toContain('<svg x=');
+        expect(svg).toMatch(/id="php-/);
+        expect(svg).toMatch(/url\(#vscode-/);
+        expect(svg).not.toMatch(/xlink:|<script|<metadata/);
+    });
+
     it('has no duplicate ids', () => {
         expect(new Set(iconIds()).size).toBe(iconIds().length);
     });

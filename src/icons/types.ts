@@ -4,10 +4,11 @@ export interface PathIcon {
     path: string;
 }
 
-export interface MonogramIcon {
+export interface SvgIcon {
     title: string;
     hex: string;
-    monogram: string;
+    viewBox: string;
+    body: string;
 }
 
-export type Icon = PathIcon | MonogramIcon;
+export type Icon = PathIcon | SvgIcon;
