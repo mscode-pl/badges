@@ -1,0 +1,14 @@
+name = "badges"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+routes = [{ pattern = "badges.mscode.pl", custom_domain = true }]
+
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf", "**/*.woff"]
+fallthrough = false
+
+[observability]
+enabled = true
