@@ -137,17 +137,6 @@ const gradients = { jetbrains: ['#ff318c', '#7256ff'] };
 // Logos Simple Icons only has in one colour, rebuilt from its path: extra shapes on top, or the path split into colour regions.
 const layered = {
     youtube: (path) => `<path fill="#ff0000" d="${path}"/><path fill="#ffffff" d="M9.545 15.568V8.432L15.818 12z"/>`,
-    gmail: (path) => {
-        const regions = [
-            ['#4285f4', 0, 5.2, 5.455, 18.8],
-            ['#c5221f', 0, 0, 5.455, 5.2],
-            ['#ea4335', 5.455, 0, 13.09, 24],
-            ['#34a853', 18.545, 5.2, 5.455, 18.8],
-            ['#fbbc04', 18.545, 0, 5.455, 5.2],
-        ];
-        const defs = regions.map(([, x, y, w, h], i) => `<clipPath id="gmail-r${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`).join('');
-        return `<defs>${defs}</defs>${regions.map(([fill], i) => `<path clip-path="url(#gmail-r${i})" fill="${fill}" d="${path}"/>`).join('')}`;
-    },
 };
 
 // Detailed marks with thin lines get a stroke in their own colour so they survive at 40px.
@@ -160,13 +149,14 @@ const backing = {
     css: '#ffffff',
 };
 
-// Multi-colour logos Simple Icons does not carry, from Wikimedia Commons (public domain) and przelewy24.pl.
+// Multi-colour logos Simple Icons does not carry, from Wikimedia Commons (public domain), przelewy24.pl and Google's Gmail mark.
 const brand = {
     php: { title: 'PHP', hex: '#777bb4', mono: 'none' },
     vscode: { title: 'Visual Studio Code', hex: '#007acc', mono: 'cutout' },
     linkedin: { title: 'LinkedIn', hex: '#007ebb', mono: 'cutout', full: true },
     przelewy24: { title: 'Przelewy24', hex: '#d13239', mono: 'recolor' },
     inpost: { title: 'InPost', hex: '#ffcb04', mono: 'cutout' },
+    gmail: { title: 'Gmail', hex: '#ea4335', mono: 'cutout' },
 };
 
 function sanitize(id, source) {
