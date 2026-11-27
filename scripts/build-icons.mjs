@@ -106,6 +106,10 @@ const selection = {
     tiktok: 'tiktok',
     gmail: 'gmail',
     wakatime: 'wakatime',
+    lua: 'lua',
+    c: 'c',
+    dotnet: 'dotnet',
+    rabbitmq: 'rabbitmq',
     chrome: 'googlechrome',
     claude: 'claude',
     anthropic: 'anthropic',
@@ -195,6 +199,9 @@ function sanitize(id, source) {
 // Full-colour originals from devicon (MIT) for logos Simple Icons reduces to one colour; Simple Icons still gives the one-colour mark.
 const devicon = new Set(fs.readdirSync(new URL('../icons/devicon/', import.meta.url)).filter((f) => f.endsWith('.svg')).map((f) => f.slice(0, -4)));
 
+// Devicon logos with no Simple Icons counterpart; on a colour tile they keep their own colours on white.
+const deviconOnly = { cs: { title: 'C#', hex: '#68217a' } };
+
 const round = (v) => Math.round(v * 100) / 100;
 const lines = [];
 for (const [id, slug] of Object.entries(selection)) {
@@ -232,6 +239,10 @@ for (const [id, slug] of Object.entries(selection)) {
     const box = [x0, y0, x1 - x0, y1 - y0].map(round).join(' ');
     const extra = (backing[id] ? `, backing: '${backing[id]}'` : '') + (bold[id] ? `, bold: ${bold[id]}` : '');
     lines.push([id, `{ title: ${JSON.stringify(icon.title)}, hex: '${hex}', path: ${JSON.stringify(icon.path)}, box: '${box}'${extra} }`]);
+}
+for (const [id, meta] of Object.entries(deviconOnly)) {
+    const { viewBox, body } = sanitize(id, fs.readFileSync(new URL(`../icons/devicon/${id}.svg`, import.meta.url), 'utf8'));
+    lines.push([id, `{ title: ${JSON.stringify(meta.title)}, hex: '${meta.hex}', viewBox: '${viewBox}', body: ${JSON.stringify(body)}, tile: '#ffffff' }`]);
 }
 for (const [id, meta] of Object.entries(brand)) {
     const { viewBox, body, mono, recolored } = sanitize(id, fs.readFileSync(new URL(`../icons/brand/${id}.svg`, import.meta.url), 'utf8'));

@@ -171,6 +171,13 @@ describe('wakatime and wakapi', () => {
         expect(await wakaTime(ctx, wakatimeSource, 'mati', 'last_7_days', 'typescript')).toEqual({ label: 'TypeScript', message: '1 hr' });
     });
 
+    it('reads the public WakaTime badge for a user id', async () => {
+        const id = 'b7065cab-63e5-400a-9acf-4689cff3cc57';
+        const svg = '<svg><text x="1">wakatime</text><text x="2">3,496 hrs 21 mins</text></svg>';
+        const { ctx } = mock({ [`https://wakatime.com/badge/user/${id}.svg`]: new Response(svg) });
+        expect(await wakaTime(ctx, wakatimeSource, id, 'all_time')).toEqual({ label: 'wakatime', message: '3,496 hrs' });
+    });
+
     it('talks to a Wakapi instance through its WakaTime API, mapping the year range', async () => {
         const source = wakapiSource('https://waka.example.com/sub/')!;
         const { ctx, calls } = mock({ 'https://waka.example.com/sub/api/compat/wakatime/v1/users/mati/stats/last_12_months': { data: { total_seconds: 60 } } });

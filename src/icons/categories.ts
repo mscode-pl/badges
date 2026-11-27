@@ -1,7 +1,7 @@
 export const categories: { name: string; ids: string[] }[] = [
-    { name: 'Languages', ids: ['ts', 'js', 'php', 'py', 'go', 'rust', 'kotlin', 'swift', 'dart', 'bash', 'html', 'css', 'sass', 'graphql'] },
+    { name: 'Languages', ids: ['ts', 'js', 'php', 'py', 'go', 'rust', 'kotlin', 'swift', 'dart', 'bash', 'lua', 'c', 'cs', 'html', 'css', 'sass', 'graphql'] },
     { name: 'Frontend', ids: ['nextjs', 'react', 'vue', 'nuxt', 'svelte', 'angular', 'astro', 'vite', 'tailwind', 'redux', 'expo', 'flutter', 'electron', 'storybook'] },
-    { name: 'Backend', ids: ['nodejs', 'bun', 'deno', 'hono', 'express', 'nestjs', 'laravel', 'django', 'fastapi'] },
+    { name: 'Backend', ids: ['nodejs', 'bun', 'deno', 'hono', 'express', 'nestjs', 'laravel', 'django', 'fastapi', 'dotnet', 'rabbitmq'] },
     { name: 'Databases', ids: ['postgres', 'mysql', 'mariadb', 'sqlite', 'mongodb', 'redis', 'prisma', 'drizzle', 'supabase', 'firebase'] },
     {
         name: 'Cloud and DevOps',

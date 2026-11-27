@@ -40,6 +40,8 @@ const aliases: Record<string, string> = {
     mail: 'email',
     twitter: 'x',
     woo: 'woocommerce',
+    csharp: 'cs',
+    dotnetcore: 'dotnet',
 };
 
 export function findIcon(id: string | null | undefined): Icon | undefined {

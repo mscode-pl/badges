@@ -65,7 +65,25 @@ interface AllTime {
     data: { total_seconds: number };
 }
 
+const badgeId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// WakaTime's own badge for a user id is public even when the profile stats are not, so the total comes from its text.
+async function wakatimeBadge(ctx: Context, id: string): Promise<BadgeData> {
+    const res = await ctx.fetch(`https://wakatime.com/badge/user/${id.toLowerCase()}.svg`, {
+        headers: { 'user-agent': 'mscode-badges' },
+        cf: { cacheTtl: 600, cacheEverything: true },
+    } as RequestInit);
+    if (res.status === 404) throw new UpstreamError('no such badge', true);
+    if (!res.ok) throw new UpstreamError(`${res.status} from wakatime badge`);
+    const texts = [...(await res.text()).matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]!.trim());
+    const total = texts.at(-1)?.match(/^(?:([\d,]+) hrs?)?\s*(?:(\d+) mins?)?$/);
+    if (!total || (!total[1] && !total[2])) throw new UpstreamError('unreadable wakatime badge');
+    const seconds = Number((total[1] ?? '0').replace(/,/g, '')) * 3600 + Number(total[2] ?? 0) * 60;
+    return { label: 'wakatime', message: codingTime(seconds) };
+}
+
 export async function wakaTime(ctx: Context, source: WakaSource, user: string, range: string, language?: string): Promise<BadgeData> {
+    if (source === wakatimeSource && badgeId.test(user) && range === 'all_time' && !language) return wakatimeBadge(ctx, user);
     const userPath = `${source.base}/users/${encodeURIComponent(user)}`;
     if (!language && range === 'all_time') {
         const all = await getJson<AllTime>(ctx, `${userPath}/all_time_since_today`);
